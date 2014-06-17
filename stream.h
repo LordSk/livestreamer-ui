@@ -7,7 +7,9 @@
 #include <QTreeWidget>
 #include <QProcess>
 
-// base stream object class
+/**
+ * @brief Base stream class
+ */
 class Stream: public QObject
 {
 	Q_OBJECT
@@ -39,6 +41,7 @@ public:
 
 	QString getUrl() const;
 
+	// visual representation (QTreeWidgetItem)
 	void createListItem(QTreeWidget* parent);
 	void removeListItem();
 	bool sameListItem(QTreeWidgetItem* other) const;
@@ -46,9 +49,9 @@ public:
 	bool operator==(Stream const& other) const;
 };
 
-// parse what the user gave us
-Stream* parseStreamUrl(QString const& url);
-
+/**
+ * @brief Basic exception class
+ */
 class StreamException : public QException
 {
 	int m_type;
@@ -65,5 +68,12 @@ public:
 		LIVESTREAMER_FAILED
 	};
 };
+
+/**
+ * @brief Parse the url and returns a Stream object
+ * @param url
+ * @return Stream*
+ */
+Stream* parseStreamUrl(QString const& url);
 
 #endif // STREAM_H
