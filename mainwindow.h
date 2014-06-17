@@ -52,14 +52,33 @@ private:
 
 	const QString m_configPath;
 
+	enum Quality {
+		QUALITY_LOW=0,
+		QUALITY_MEDIUM,
+		QUALITY_HIGH,
+		QUALITY_BEST,
+		QUALITY_MAX
+	};
+
+	struct {
+		QString livestreamerPath;
+		unsigned int preferredQuality;
+		unsigned int autoUpdateStreams;
+		unsigned int updateInterval;
+
+	} m_settings;
+
 	void actionAddStream();
 	void actionRemoveStream();
 	void actionWatchStream();
 
+	StreamItem* getSelectedStream();
+
 	void loadStreams();
 	void saveStreams();
 
-	StreamItem* getSelectedStream();
+	void loadSettings();
+	void saveSettings();
 };
 
 #endif // MAINWINDOW_H

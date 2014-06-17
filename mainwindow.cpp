@@ -55,11 +55,18 @@ MainWindow::MainWindow(QWidget *parent) :
 	  configDir.mkdir(".");
 	}
 
+	m_settings.livestreamerPath = "livestreamer";
+	m_settings.preferredQuality = QUALITY_BEST;
+	m_settings.autoUpdateStreams = 0;
+	m_settings.updateInterval = 60;
+
+	loadSettings();
 	loadStreams();
 }
 
 MainWindow::~MainWindow()
 {
+	saveSettings();
 	saveStreams();
 	delete ui;
 
@@ -197,6 +204,17 @@ void MainWindow::actionWatchStream()
 	}
 }
 
+StreamItem* MainWindow::getSelectedStream()
+{
+	auto selectedItems = ui->streamList->selectedItems();
+
+	if(selectedItems.size() > 0) {
+		return static_cast<StreamItem*>(selectedItems.first());
+	}
+
+	return nullptr;
+}
+
 void MainWindow::loadStreams()
 {
 	QFile file(m_configPath + "/" + STREAM_SAVE_FILENAME);
@@ -239,13 +257,48 @@ void MainWindow::saveStreams()
 	}
 }
 
-StreamItem* MainWindow::getSelectedStream()
+void MainWindow::loadSettings()
 {
-	auto selectedItems = ui->streamList->selectedItems();
-
-	if(selectedItems.size() > 0) {
-		return static_cast<StreamItem*>(selectedItems.first());
+	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		statusError("Failed to load settings.");
+		return;
 	}
 
-	return nullptr;
+	QTextStream in(&file);
+
+	QString livestreamerPath;
+	unsigned int preferredQuality;
+	unsigned int autoUpdateStreams;
+	unsigned int updateInterval;
+
+	in >> livestreamerPath;
+	in >> preferredQuality;
+	in >> autoUpdateStreams;
+	in >> updateInterval;
+
+	if(!livestreamerPath.length() > 1)
+		m_settings.livestreamerPath = livestreamerPath;
+	if(preferredQuality < QUALITY_MAX)
+		m_settings.preferredQuality = preferredQuality;
+	if(autoUpdateStreams < 2)
+		m_settings.autoUpdateStreams = autoUpdateStreams;
+	if(updateInterval > 2 && updateInterval < 60*60*5) // 5h hours max
+		m_settings.updateInterval = updateInterval;
+
+	statusMsg("Settings loaded.");
+}
+
+void MainWindow::saveSettings()
+{
+	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+
+	QTextStream out(&file);
+
+	out << m_settings.livestreamerPath << "\n";
+	out << m_settings.preferredQuality << "\n";
+	out << m_settings.autoUpdateStreams << "\n";
+	out << m_settings.updateInterval << "\n";
 }
