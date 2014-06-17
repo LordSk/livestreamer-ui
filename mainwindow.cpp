@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QStandardPaths>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -75,7 +76,13 @@ MainWindow::~MainWindow()
 	}
 }
 
-void MainWindow::statusMsg(const QString& msg)
+void MainWindow::statusStream(const QString& msg)
+{
+	ui->statusBar->setStyleSheet("QStatusBar { color: blue; }");
+	ui->statusBar->showMessage(msg, 5000);
+}
+
+void MainWindow::statusValidate(const QString& msg)
 {
 	ui->statusBar->setStyleSheet("QStatusBar { color: green; }");
 	ui->statusBar->showMessage(msg);
@@ -132,6 +139,40 @@ void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int colu
 	Q_UNUSED(column)
 
 	actionWatchStream();
+}
+
+QString MainWindow::getQualityStr()
+{
+	switch(m_settings.preferredQuality) {
+	case QUALITY_LOW:
+		return "low";
+	case QUALITY_MEDIUM:
+		return "medium";
+	case QUALITY_HIGH:
+		return "high";
+	case QUALITY_BEST:
+		return "best";
+	}
+
+	return "best";
+}
+
+void MainWindow::on_actionLivestreamer_location_triggered()
+{
+	QFileDialog dialog(this);
+
+	dialog.setFilter(QDir::Files | QDir::Executable);
+	dialog.setDirectory(m_settings.livestreamerPath);
+#ifdef Q_OS_WIN
+	dialog.setNameFilter(tr("Executable (*.exe)"));
+#endif
+
+	if(dialog.exec()) {
+		QStringList selected = dialog.selectedFiles();
+
+		if(selected.size() > 0)
+			m_settings.livestreamerPath = selected.first();
+	}
 }
 
 void MainWindow::actionAddStream()
@@ -196,11 +237,12 @@ void MainWindow::actionWatchStream()
 		return;
 
 	try {
-		s->watch();
+		statusStream(s->getUrl() + " starting...");
+		s->watch(m_settings.livestreamerPath, getQualityStr());
 	}
 	catch(StreamException &e) {
 		Q_UNUSED(e)
-		statusMsg("Error: couldn't start livestreamer");
+		statusError("Error: couldn't start livestreamer.");
 	}
 }
 
@@ -241,7 +283,7 @@ void MainWindow::loadStreams()
 		}
 	}
 
-	statusMsg("Streams loaded.");
+	statusValidate("Streams loaded.");
 }
 
 void MainWindow::saveStreams()
@@ -253,7 +295,7 @@ void MainWindow::saveStreams()
 	QTextStream out(&file);
 
 	for(auto s : m_streams) {
-		out << s->getUrl() << "\n";
+		out << "http://" + s->getUrl() << "\n";
 	}
 }
 
@@ -265,19 +307,28 @@ void MainWindow::loadSettings()
 		return;
 	}
 
-	QTextStream in(&file);
-
 	QString livestreamerPath;
 	unsigned int preferredQuality;
 	unsigned int autoUpdateStreams;
 	unsigned int updateInterval;
 
-	in >> livestreamerPath;
-	in >> preferredQuality;
-	in >> autoUpdateStreams;
-	in >> updateInterval;
+	QString line = file.readLine();
+	line.remove('\n');
+	livestreamerPath = line;
 
-	if(!livestreamerPath.length() > 1)
+	line = file.readLine();
+	line.remove('\n');
+	preferredQuality = line.toInt();
+
+	line = file.readLine();
+	line.remove('\n');
+	autoUpdateStreams = line.toInt();
+
+	line = file.readLine();
+	line.remove('\n');
+	updateInterval = line.toInt();
+
+	if(livestreamerPath.length() > 1)
 		m_settings.livestreamerPath = livestreamerPath;
 	if(preferredQuality < QUALITY_MAX)
 		m_settings.preferredQuality = preferredQuality;
@@ -286,7 +337,7 @@ void MainWindow::loadSettings()
 	if(updateInterval > 2 && updateInterval < 60*60*5) // 5h hours max
 		m_settings.updateInterval = updateInterval;
 
-	statusMsg("Settings loaded.");
+	statusValidate("Settings loaded.");
 }
 
 void MainWindow::saveSettings()

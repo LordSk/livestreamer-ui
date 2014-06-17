@@ -23,7 +23,8 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-	void statusMsg(QString const& msg);
+	void statusStream(QString const& msg);
+	void statusValidate(QString const& msg);
 	void statusError(QString const& msg);
 
 private slots:
@@ -31,6 +32,9 @@ private slots:
 	void on_actionAdd_stream_triggered();
 	void on_actionRemove_selected_triggered();
 	void on_actionClear_all_triggered();
+
+	// Options menu
+	void on_actionLivestreamer_location_triggered();
 
 	// Toolbar
 	void onAddButton_released();
@@ -65,8 +69,9 @@ private:
 		unsigned int preferredQuality;
 		unsigned int autoUpdateStreams;
 		unsigned int updateInterval;
-
 	} m_settings;
+
+	QString getQualityStr();
 
 	void actionAddStream();
 	void actionRemoveStream();

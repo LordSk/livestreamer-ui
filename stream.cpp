@@ -42,7 +42,7 @@ void StreamItem::on_processFinished(int exitStatus)
 
 QString StreamItem::getUrl() const
 {
-	return "http://" + m_host + "/" + m_name;
+	return m_host + "/" + m_name;
 }
 
 bool StreamItem::update()
@@ -50,15 +50,15 @@ bool StreamItem::update()
 	return true;
 }
 
-void StreamItem::watch()
+void StreamItem::watch(QString livestreamerPath, QString quality)
 {
 	// process already running, abort
 	if(m_process)
 		return;
 
-	QString program = "livestreamer";
+	QString program = livestreamerPath;
 	QStringList arguments;
-	arguments << getUrl() << "best";
+	arguments << getUrl() << quality;
 
 	m_process = new QProcess(this);
 	m_process->start(program, arguments);

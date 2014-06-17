@@ -32,7 +32,7 @@ public:
 	virtual ~StreamItem();
 
 	virtual bool update();
-	void watch();
+	void watch(QString livestreamerPath, QString quality);
 	QString getUrl() const;
 
 	bool operator==(StreamItem const& other) const;
