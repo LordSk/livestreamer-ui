@@ -62,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_settings.updateInterval = 60;
 
 	loadSettings();
+
+	updateQuality(m_settings.preferredQuality);
+
 	loadStreams();
 }
 
@@ -113,6 +116,44 @@ void MainWindow::on_actionClear_all_triggered()
 	m_streams.clear();
 }
 
+void MainWindow::on_actionLivestreamer_location_triggered()
+{
+	QFileDialog dialog(this);
+
+	dialog.setFilter(QDir::Files | QDir::Executable);
+	dialog.setDirectory(m_settings.livestreamerPath);
+#ifdef Q_OS_WIN
+	dialog.setNameFilter(tr("Executable (*.exe)"));
+#endif
+
+	if(dialog.exec()) {
+		QStringList selected = dialog.selectedFiles();
+
+		if(selected.size() > 0)
+			m_settings.livestreamerPath = selected.first();
+	}
+}
+
+void MainWindow::on_actionLow_triggered()
+{
+	updateQuality(QUALITY_LOW);
+}
+
+void MainWindow::on_actionMedium_triggered()
+{
+	updateQuality(QUALITY_MEDIUM);
+}
+
+void MainWindow::on_actionHigh_triggered()
+{
+	updateQuality(QUALITY_HIGH);
+}
+
+void MainWindow::on_actionBest_triggered()
+{
+	updateQuality(QUALITY_BEST);
+}
+
 void MainWindow::onAddButton_released()
 {
 	actionAddStream();
@@ -157,21 +198,20 @@ QString MainWindow::getQualityStr()
 	return "best";
 }
 
-void MainWindow::on_actionLivestreamer_location_triggered()
+void MainWindow::updateQuality(unsigned int quality)
 {
-	QFileDialog dialog(this);
+	if(quality >= QUALITY_MAX)
+		return;
 
-	dialog.setFilter(QDir::Files | QDir::Executable);
-	dialog.setDirectory(m_settings.livestreamerPath);
-#ifdef Q_OS_WIN
-	dialog.setNameFilter(tr("Executable (*.exe)"));
-#endif
+	m_settings.preferredQuality = quality;
 
-	if(dialog.exec()) {
-		QStringList selected = dialog.selectedFiles();
-
-		if(selected.size() > 0)
-			m_settings.livestreamerPath = selected.first();
+	int i = 0;
+	for(auto a : ui->menuPreferred_quality->actions()) {
+		if(i == m_settings.preferredQuality)
+			a->setChecked(true);
+		else
+			a->setChecked(false);
+		i++;
 	}
 }
 

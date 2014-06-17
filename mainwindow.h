@@ -35,6 +35,10 @@ private slots:
 
 	// Options menu
 	void on_actionLivestreamer_location_triggered();
+	void on_actionLow_triggered();
+	void on_actionMedium_triggered();
+	void on_actionHigh_triggered();
+	void on_actionBest_triggered();
 
 	// Toolbar
 	void onAddButton_released();
@@ -72,6 +76,7 @@ private:
 	} m_settings;
 
 	QString getQualityStr();
+	void updateQuality(unsigned int quality);
 
 	void actionAddStream();
 	void actionRemoveStream();
