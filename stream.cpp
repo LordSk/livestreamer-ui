@@ -3,22 +3,21 @@
 #include <QUrl>
 #include <QtDebug>
 
-Stream::Stream()
-	: Stream("")
-{
-}
-
-Stream::Stream(QString const& name)
+StreamItem::StreamItem(QTreeWidget* parent, QString const& name)
+	:QTreeWidgetItem(parent)
 {
 	m_host = "";
 	m_name = name;
 	m_viewerCount = 0;
 	m_online = false;
-	m_listItem = nullptr;
 	m_process = nullptr;
+
+	setIcon(0, QIcon(":twitch.ico")); // twitch icon by default
+	setText(1, m_name);
+	setText(2, "0");
 }
 
-Stream::~Stream()
+StreamItem::~StreamItem()
 {
 	// kill livestreamer if we exit early
 	if(m_process) {
@@ -26,37 +25,32 @@ Stream::~Stream()
 	}
 }
 
-void Stream::setWatching(bool watching)
+void StreamItem::setWatching(bool watching)
 {
 	if(watching)
-		m_listItem->setTextColor(1, QColor("blue"));
+		setTextColor(1, QColor("blue"));
 	else
-		m_listItem->setTextColor(1, QColor("black"));
+		setTextColor(1, QColor("black"));
 }
 
-void Stream::on_processFinished(int exitStatus)
+void StreamItem::on_processFinished(int exitStatus)
 {
 	Q_UNUSED(exitStatus)
 	setWatching(false);
 	m_process = nullptr;
 }
 
-QIcon Stream::getIcon() const
-{
-	return QIcon(":twitch.ico");
-}
-
-QString Stream::getUrl() const
+QString StreamItem::getUrl() const
 {
 	return "http://" + m_host + "/" + m_name;
 }
 
-bool Stream::update()
+bool StreamItem::update()
 {
 	return true;
 }
 
-void Stream::watch()
+void StreamItem::watch()
 {
 	// process already running, abort
 	if(m_process)
@@ -78,39 +72,16 @@ void Stream::watch()
 	QObject::connect(m_process, SIGNAL(finished(int)), this, SLOT(on_processFinished(int)));
 }
 
-void Stream::createListItem(QTreeWidget* parent)
-{
-	m_listItem = new QTreeWidgetItem(parent);
-	m_listItem->setIcon(0, getIcon());
-	m_listItem->setText(1, m_name);
-	m_listItem->setText(2, "0");
-}
-
-void Stream::removeListItem()
-{
-	if(m_listItem)
-		delete m_listItem;
-}
-
-bool Stream::sameListItem(QTreeWidgetItem* other) const
-{
-	if(m_listItem) {
-		if(m_listItem == other && m_listItem->text(1) == other->text(1))
-			return true;
-	}
-
-	return false;
-}
-
-bool Stream::operator==(const Stream& other) const
+bool StreamItem::operator==(const StreamItem& other) const
 {
 	if(m_host == other.m_host && m_name == other.m_name)
 		return true;
 	return false;
 }
 
-Stream* parseStreamUrl(QString const& url)
+StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)
 {
+	// pre parsing via QUrl
 	QUrl qurl(url, QUrl::StrictMode);
 
 	if(!url.isEmpty() && qurl.isValid() && !qurl.host().isEmpty()) {
@@ -126,7 +97,7 @@ Stream* parseStreamUrl(QString const& url)
 
 		// create stream object
 		if(host == TWITCH_NAME) {
-			return new TwitchStream(name);
+			return new TwitchStreamItem(parent, name);
 		}
 
 		// host not supported
@@ -136,5 +107,5 @@ Stream* parseStreamUrl(QString const& url)
 		throw StreamException(StreamException::INVALID_URL);
 	}
 
-	return new Stream("");
+	return new StreamItem(parent, ""); // should never happen
 }

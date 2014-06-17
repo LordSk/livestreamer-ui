@@ -1,17 +1,14 @@
 #include "twitchstream.h"
 
-TwitchStream::TwitchStream(QString const& name)
-	: Stream(name)
+TwitchStreamItem::TwitchStreamItem(QTreeWidget* parent, QString const& name)
+	: StreamItem(parent, name)
 {
 	m_host = TWITCH_NAME;
+
+	setIcon(0, QIcon(":twitch.ico"));
 }
 
-bool TwitchStream::update()
+bool TwitchStreamItem::update()
 {
 	return true;
-}
-
-QIcon TwitchStream::getIcon()
-{
-	return QIcon(":twitch.ico");
 }

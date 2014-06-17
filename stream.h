@@ -10,11 +10,10 @@
 /**
  * @brief Base stream class
  */
-class Stream: public QObject
+class StreamItem: public QObject, public QTreeWidgetItem
 {
 	Q_OBJECT
 
-	QTreeWidgetItem* m_listItem;
 	QProcess* m_process;
 
 	void setWatching(bool watching);
@@ -28,25 +27,15 @@ protected:
 	int m_viewerCount;
 	bool m_online;
 
-	virtual QIcon getIcon() const;
-
 public:
-	Stream();
-	Stream(QString const& name);
-	virtual ~Stream();
+	StreamItem(QTreeWidget* parent, QString const& name);
+	virtual ~StreamItem();
 
 	virtual bool update();
-
 	void watch();
-
 	QString getUrl() const;
 
-	// visual representation (QTreeWidgetItem)
-	void createListItem(QTreeWidget* parent);
-	void removeListItem();
-	bool sameListItem(QTreeWidgetItem* other) const;
-
-	bool operator==(Stream const& other) const;
+	bool operator==(StreamItem const& other) const;
 };
 
 /**
@@ -70,10 +59,10 @@ public:
 };
 
 /**
- * @brief Parse the url and returns a Stream object
+ * @brief Parse the url and returns a new StreamItem object
  * @param url
  * @return Stream*
  */
-Stream* parseStreamUrl(QString const& url);
+StreamItem* createStreamItem(QTreeWidget* parent, QString const& url);
 
 #endif // STREAM_H

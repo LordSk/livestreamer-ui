@@ -93,7 +93,6 @@ void MainWindow::on_actionRemove_selected_triggered()
 void MainWindow::on_actionClear_all_triggered()
 {
 	for(auto s : m_streams) {
-		s->removeListItem();
 		delete s;
 	}
 
@@ -135,20 +134,20 @@ void MainWindow::actionAddStream()
 
 	if (ok && !text.isEmpty()) {
 		try {
-			Stream* newStream = parseStreamUrl(text);
+			StreamItem* newStream = createStreamItem(ui->streamList, text);
 
 			// check for duplicates
 			bool duplicate = false;
 			for(auto s : m_streams) {
 				if(*s == *newStream) {
 					duplicate = true;
+					delete newStream;
 					statusError("Error: duplicate.");
 				}
 			}
 
 			if(!duplicate) {
 				m_streams.append(newStream);
-				m_streams.back()->createListItem(ui->streamList);
 			}
 		}
 		catch(StreamException &e) {
@@ -166,11 +165,9 @@ void MainWindow::actionAddStream()
 
 void MainWindow::actionRemoveStream()
 {
-	Stream* stream = getSelectedStream();
+	StreamItem* stream = getSelectedStream();
 
 	if(stream) {
-		stream->removeListItem();
-
 		int i = 0;
 		for(auto s : m_streams) { // not efficient
 			if(*s == *stream) {
@@ -186,7 +183,7 @@ void MainWindow::actionRemoveStream()
 
 void MainWindow::actionWatchStream()
 {
-	Stream* s = getSelectedStream();
+	StreamItem* s = getSelectedStream();
 
 	if(!s)
 		return;
@@ -212,8 +209,7 @@ void MainWindow::loadStreams()
 		QString line = file.readLine();
 		line.remove('\n');
 		try {
-			m_streams.append(parseStreamUrl(line));
-			m_streams.back()->createListItem(ui->streamList);
+			m_streams.append(createStreamItem(ui->streamList, line));
 		}
 		catch(StreamException &e) {
 			switch(e.getType()) {
@@ -243,16 +239,12 @@ void MainWindow::saveStreams()
 	}
 }
 
-Stream* MainWindow::getSelectedStream()
+StreamItem* MainWindow::getSelectedStream()
 {
 	auto selectedItems = ui->streamList->selectedItems();
 
 	if(selectedItems.size() > 0) {
-		for(auto s : m_streams) {
-			if(s->sameListItem(selectedItems.first())) {
-				return s;
-			}
-		}
+		return static_cast<StreamItem*>(selectedItems.first());
 	}
 
 	return nullptr;

@@ -5,13 +5,11 @@
 
 #define TWITCH_NAME "twitch.tv"
 
-class TwitchStream : public Stream
+class TwitchStreamItem : public StreamItem
 {
-protected:
-	virtual QIcon getIcon();
 
 public:
-	TwitchStream(QString const& name);
+	TwitchStreamItem(QTreeWidget* parent, QString const& name);
 
 	virtual bool update();
 };

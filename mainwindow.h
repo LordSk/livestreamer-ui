@@ -43,7 +43,7 @@ private slots:
 
 private:
 	Ui::MainWindow *ui;
-	QVector<Stream*> m_streams;
+	QVector<StreamItem*> m_streams;
 
 	QPushButton* m_add;
 	QPushButton* m_remove;
@@ -59,7 +59,7 @@ private:
 	void loadStreams();
 	void saveStreams();
 
-	Stream* getSelectedStream();
+	StreamItem* getSelectedStream();
 };
 
 #endif // MAINWINDOW_H
