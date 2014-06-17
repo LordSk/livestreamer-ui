@@ -31,6 +31,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_watch->setToolTip("Watch selected stream");
 	m_update->setToolTip("Update all streams");
 
+	QObject::connect(m_add, SIGNAL(released()), this, SLOT(onAddButton_released()));
+	QObject::connect(m_remove, SIGNAL(released()), this, SLOT(onRemoveButton_released()));
+	QObject::connect(m_watch, SIGNAL(released()), this, SLOT(onWatchButton_released()));
+
 	auto toolbar = ui->toolBar;
 	toolbar->addWidget(m_add);
 	toolbar->addWidget(m_remove);
@@ -83,7 +87,7 @@ void MainWindow::on_actionAdd_stream_triggered()
 
 void MainWindow::on_actionRemove_selected_triggered()
 {
-	auto selected = ui->streamList->selectedItems();
+	actionRemoveStream();
 }
 
 void MainWindow::on_actionClear_all_triggered()
@@ -96,22 +100,32 @@ void MainWindow::on_actionClear_all_triggered()
 	m_streams.clear();
 }
 
+void MainWindow::onAddButton_released()
+{
+	actionAddStream();
+}
+
+void MainWindow::onRemoveButton_released()
+{
+	actionRemoveStream();
+}
+
+void MainWindow::onWatchButton_released()
+{
+	actionWatchStream();
+}
+
+void MainWindow::onUpdateButton_released()
+{
+
+}
+
 void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
+	Q_UNUSED(item)
 	Q_UNUSED(column)
 
-	for(auto s : m_streams) {
-		if(s->sameListItem(item)) {
-			try {
-				s->watch();
-			}
-			catch(StreamException &e) {
-				Q_UNUSED(e)
-				statusMsg("Error: couldn't start livestreamer");
-			}
-			break;
-		}
-	}
+	actionWatchStream();
 }
 
 void MainWindow::actionAddStream()
@@ -147,6 +161,42 @@ void MainWindow::actionAddStream()
 				break;
 			}
 		}
+	}
+}
+
+void MainWindow::actionRemoveStream()
+{
+	Stream* stream = getSelectedStream();
+
+	if(stream) {
+		stream->removeListItem();
+
+		int i = 0;
+		for(auto s : m_streams) { // not efficient
+			if(*s == *stream) {
+				m_streams.remove(i);
+				delete s;
+				return;
+			}
+
+			i++;
+		}
+	}
+}
+
+void MainWindow::actionWatchStream()
+{
+	Stream* s = getSelectedStream();
+
+	if(!s)
+		return;
+
+	try {
+		s->watch();
+	}
+	catch(StreamException &e) {
+		Q_UNUSED(e)
+		statusMsg("Error: couldn't start livestreamer");
 	}
 }
 
@@ -191,4 +241,19 @@ void MainWindow::saveStreams()
 	for(auto s : m_streams) {
 		out << s->getUrl() << "\n";
 	}
+}
+
+Stream* MainWindow::getSelectedStream()
+{
+	auto selectedItems = ui->streamList->selectedItems();
+
+	if(selectedItems.size() > 0) {
+		for(auto s : m_streams) {
+			if(s->sameListItem(selectedItems.first())) {
+				return s;
+			}
+		}
+	}
+
+	return nullptr;
 }

@@ -32,6 +32,13 @@ private slots:
 	void on_actionRemove_selected_triggered();
 	void on_actionClear_all_triggered();
 
+	// Toolbar
+	void onAddButton_released();
+	void onRemoveButton_released();
+	void onWatchButton_released();
+	void onUpdateButton_released();
+
+	// Item list
 	void on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
@@ -46,8 +53,13 @@ private:
 	const QString m_configPath;
 
 	void actionAddStream();
+	void actionRemoveStream();
+	void actionWatchStream();
+
 	void loadStreams();
 	void saveStreams();
+
+	Stream* getSelectedStream();
 };
 
 #endif // MAINWINDOW_H
