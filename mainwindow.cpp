@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(m_add, SIGNAL(released()), this, SLOT(onAddButton_released()));
 	QObject::connect(m_remove, SIGNAL(released()), this, SLOT(onRemoveButton_released()));
 	QObject::connect(m_watch, SIGNAL(released()), this, SLOT(onWatchButton_released()));
+	QObject::connect(m_update, SIGNAL(released()), this, SLOT(onUpdateButton_released()));
 
 	auto toolbar = ui->toolBar;
 	toolbar->addWidget(m_add);
@@ -63,9 +64,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	loadSettings();
 
-	updateQuality(m_settings.preferredQuality);
+	updateStreamQuality(m_settings.preferredQuality);
 
 	loadStreams();
+
+	// get viewers and stuff
+	actionUpdateStreams();
 }
 
 MainWindow::~MainWindow()
@@ -136,22 +140,22 @@ void MainWindow::on_actionLivestreamer_location_triggered()
 
 void MainWindow::on_actionLow_triggered()
 {
-	updateQuality(QUALITY_LOW);
+	updateStreamQuality(QUALITY_LOW);
 }
 
 void MainWindow::on_actionMedium_triggered()
 {
-	updateQuality(QUALITY_MEDIUM);
+	updateStreamQuality(QUALITY_MEDIUM);
 }
 
 void MainWindow::on_actionHigh_triggered()
 {
-	updateQuality(QUALITY_HIGH);
+	updateStreamQuality(QUALITY_HIGH);
 }
 
 void MainWindow::on_actionBest_triggered()
 {
-	updateQuality(QUALITY_BEST);
+	updateStreamQuality(QUALITY_BEST);
 }
 
 void MainWindow::onAddButton_released()
@@ -171,7 +175,7 @@ void MainWindow::onWatchButton_released()
 
 void MainWindow::onUpdateButton_released()
 {
-
+	actionUpdateStreams();
 }
 
 void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -198,7 +202,7 @@ QString MainWindow::getQualityStr()
 	return "best";
 }
 
-void MainWindow::updateQuality(unsigned int quality)
+void MainWindow::updateStreamQuality(unsigned int quality)
 {
 	if(quality >= QUALITY_MAX)
 		return;
@@ -283,6 +287,13 @@ void MainWindow::actionWatchStream()
 	catch(StreamException &e) {
 		Q_UNUSED(e)
 		statusError("Error: couldn't start livestreamer.");
+	}
+}
+
+void MainWindow::actionUpdateStreams()
+{
+	for(auto s : m_streams) {
+		s->update();
 	}
 }
 

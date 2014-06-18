@@ -76,11 +76,12 @@ private:
 	} m_settings;
 
 	QString getQualityStr();
-	void updateQuality(unsigned int quality);
+	void updateStreamQuality(unsigned int quality);
 
 	void actionAddStream();
 	void actionRemoveStream();
 	void actionWatchStream();
+	void actionUpdateStreams();
 
 	StreamItem* getSelectedStream();
 

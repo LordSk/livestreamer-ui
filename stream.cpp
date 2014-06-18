@@ -10,11 +10,14 @@ StreamItem::StreamItem(QTreeWidget* parent, QString const& name)
 	m_name = name;
 	m_viewerCount = 0;
 	m_online = false;
+	m_watching = false;
 	m_process = nullptr;
 
 	setIcon(0, QIcon(":twitch.ico")); // twitch icon by default
 	setText(1, m_name);
 	setText(2, "0");
+
+	updateInfos();
 }
 
 StreamItem::~StreamItem()
@@ -25,8 +28,24 @@ StreamItem::~StreamItem()
 	}
 }
 
+void StreamItem::updateInfos()
+{
+	if(m_online) {
+		if(!m_watching)
+			setTextColor(1, QColor("black"));
+		setTextColor(2, QColor("red"));
+		setText(2, QString::number(m_viewerCount));
+	}
+	else {
+		setTextColor(1, QColor("grey"));
+		setTextColor(2, QColor("grey"));
+	}
+}
+
 void StreamItem::setWatching(bool watching)
 {
+	m_watching = watching;
+
 	if(watching)
 		setTextColor(1, QColor("blue"));
 	else

@@ -26,6 +26,9 @@ protected:
 	QString m_name;
 	int m_viewerCount;
 	bool m_online;
+	bool m_watching;
+
+	void updateInfos();
 
 public:
 	StreamItem(QTreeWidget* parent, QString const& name);
