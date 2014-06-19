@@ -95,13 +95,13 @@ void MainWindow::statusStream(const QString& msg)
 void MainWindow::statusValidate(const QString& msg)
 {
 	ui->statusBar->setStyleSheet("QStatusBar { color: green; }");
-	ui->statusBar->showMessage(msg);
+	ui->statusBar->showMessage(msg, 10000);
 }
 
 void MainWindow::statusError(const QString& msg)
 {
 	ui->statusBar->setStyleSheet("QStatusBar { color: red; }");
-	ui->statusBar->showMessage(msg);
+	ui->statusBar->showMessage(msg, 10000);
 }
 
 void MainWindow::on_actionAdd_stream_triggered()
