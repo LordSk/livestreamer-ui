@@ -13,9 +13,9 @@ StreamItem::StreamItem(QTreeWidget* parent, QString const& name)
 	m_watching = false;
 	m_process = nullptr;
 
-	setIcon(0, QIcon(":twitch.ico")); // twitch icon by default
-	setText(1, m_name);
-	setText(2, "0");
+	setIcon(COLUMN_ICON, QIcon(":twitch.ico")); // twitch icon by default
+	setText(COLUMN_NAME, m_name);
+	setText(COLUMN_VIEWERS, "0");
 
 	updateInfos();
 }
@@ -32,13 +32,13 @@ void StreamItem::updateInfos()
 {
 	if(m_online) {
 		if(!m_watching)
-			setTextColor(1, QColor("black"));
-		setTextColor(2, QColor("red"));
-		setText(2, QString::number(m_viewerCount));
+			setTextColor(COLUMN_NAME, QColor("black"));
+		setTextColor(COLUMN_VIEWERS, QColor("red"));
+		setText(COLUMN_VIEWERS, QString::number(m_viewerCount));
 	}
 	else {
-		setTextColor(1, QColor("grey"));
-		setTextColor(2, QColor("grey"));
+		setTextColor(COLUMN_NAME, QColor("grey"));
+		setTextColor(COLUMN_VIEWERS, QColor("grey"));
 	}
 }
 
@@ -47,9 +47,9 @@ void StreamItem::setWatching(bool watching)
 	m_watching = watching;
 
 	if(watching)
-		setTextColor(1, QColor("blue"));
+		setTextColor(COLUMN_NAME, QColor("blue"));
 	else
-		setTextColor(1, QColor("black"));
+		setTextColor(COLUMN_NAME, QColor("black"));
 }
 
 void StreamItem::on_processFinished(int exitStatus)
@@ -96,6 +96,22 @@ bool StreamItem::operator==(const StreamItem& other) const
 	if(m_host == other.m_host && m_name == other.m_name)
 		return true;
 	return false;
+}
+
+bool StreamItem::operator<(const QTreeWidgetItem& other) const
+{
+	int column = treeWidget()->sortColumn();
+
+	switch(column) {
+		case COLUMN_ICON: // icon name sort
+			return icon(COLUMN_ICON).name().toLower() < other.icon(COLUMN_ICON).name().toLower();
+		case COLUMN_NAME: // string sort
+			return text(COLUMN_NAME).toLower() < other.text(COLUMN_NAME).toLower();
+		case COLUMN_VIEWERS: // int sort
+			return text(COLUMN_VIEWERS).toInt() < other.text(COLUMN_VIEWERS).toInt();
+	}
+
+	return text(column).toLower() < other.text(column).toLower();
 }
 
 StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)

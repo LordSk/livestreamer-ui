@@ -16,6 +16,12 @@ class StreamItem: public QObject, public QTreeWidgetItem
 
 	QProcess* m_process;
 
+	enum {
+		COLUMN_ICON,
+		COLUMN_NAME,
+		COLUMN_VIEWERS,
+	};
+
 	void setWatching(bool watching);
 
 private slots:
@@ -39,6 +45,7 @@ public:
 	QString getUrl() const;
 
 	bool operator==(StreamItem const& other) const;
+	virtual bool operator<(const QTreeWidgetItem &other) const;
 };
 
 /**

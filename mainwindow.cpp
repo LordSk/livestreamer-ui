@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	streamList->setColumnWidth(1, 150); // second column (Name)
 	streamList->setColumnWidth(2, 50); // third column (Viewers)
 
-
 	// create the config folder
 	QDir configDir(m_configPath);
 	if (!configDir.exists()){
@@ -70,6 +69,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// get viewers and stuff
 	actionUpdateStreams();
+
+	 // enable sorting by column
+	streamList->setSortingEnabled(true);
+	streamList->header()->setSortIndicator(2, Qt::DescendingOrder); // sort by viewer count
 }
 
 MainWindow::~MainWindow()
