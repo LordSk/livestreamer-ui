@@ -34,7 +34,7 @@ protected:
 	bool m_online;
 	bool m_watching;
 
-	void updateInfos();
+	void updateWidgetItem();
 
 public:
 	StreamItem(QTreeWidget* parent, QString const& name);

@@ -16,8 +16,9 @@ StreamItem::StreamItem(QTreeWidget* parent, QString const& name)
 	setIcon(COLUMN_ICON, QIcon(":twitch.ico")); // twitch icon by default
 	setText(COLUMN_NAME, m_name);
 	setText(COLUMN_VIEWERS, "0");
+	setTextAlignment(COLUMN_VIEWERS, Qt::AlignRight);
 
-	updateInfos();
+	updateWidgetItem();
 }
 
 StreamItem::~StreamItem()
@@ -28,7 +29,7 @@ StreamItem::~StreamItem()
 	}
 }
 
-void StreamItem::updateInfos()
+void StreamItem::updateWidgetItem()
 {
 	if(m_online) {
 		if(!m_watching)

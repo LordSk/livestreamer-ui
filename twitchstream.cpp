@@ -18,7 +18,7 @@ void TwitchStreamItem::replyFinished(QNetworkReply* reply)
 			m_viewerCount = stream.toObject()["viewers"].toInt();
 		}
 
-		updateInfos();
+		updateWidgetItem();
 	}
 
 	delete reply;
