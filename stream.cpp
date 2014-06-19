@@ -32,8 +32,11 @@ StreamItem::~StreamItem()
 void StreamItem::updateWidgetItem()
 {
 	if(m_online) {
-		if(!m_watching)
+		if(m_watching)
+			setTextColor(COLUMN_NAME, QColor("blue"));
+		else
 			setTextColor(COLUMN_NAME, QColor("black"));
+
 		setTextColor(COLUMN_VIEWERS, QColor("red"));
 		setText(COLUMN_VIEWERS, QString::number(m_viewerCount));
 	}

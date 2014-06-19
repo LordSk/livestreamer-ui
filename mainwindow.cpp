@@ -89,7 +89,7 @@ MainWindow::~MainWindow()
 void MainWindow::statusStream(const QString& msg)
 {
 	ui->statusBar->setStyleSheet("QStatusBar { color: blue; }");
-	ui->statusBar->showMessage(msg, 5000);
+	ui->statusBar->showMessage(msg, 10000);
 }
 
 void MainWindow::statusValidate(const QString& msg)
