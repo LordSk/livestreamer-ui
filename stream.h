@@ -43,6 +43,7 @@ public:
 	virtual bool update();
 	void watch(QString livestreamerPath, QString quality);
 	QString getUrl() const;
+	bool isOnline() const;
 
 	bool operator==(StreamItem const& other) const;
 	virtual bool operator<(const QTreeWidgetItem &other) const;

@@ -280,7 +280,7 @@ void MainWindow::actionWatchStream()
 {
 	StreamItem* s = getSelectedStream();
 
-	if(!s)
+	if(!s || !s->isOnline())
 		return;
 
 	try {

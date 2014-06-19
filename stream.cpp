@@ -46,23 +46,24 @@ void StreamItem::updateWidgetItem()
 void StreamItem::setWatching(bool watching)
 {
 	m_watching = watching;
-
-	if(watching)
-		setTextColor(COLUMN_NAME, QColor("blue"));
-	else
-		setTextColor(COLUMN_NAME, QColor("black"));
 }
 
 void StreamItem::on_processFinished(int exitStatus)
 {
 	Q_UNUSED(exitStatus)
 	setWatching(false);
+	updateWidgetItem();
 	m_process = nullptr;
 }
 
 QString StreamItem::getUrl() const
 {
 	return m_host + "/" + m_name;
+}
+
+bool StreamItem::isOnline() const
+{
+	return m_online;
 }
 
 bool StreamItem::update()
@@ -88,6 +89,7 @@ void StreamItem::watch(QString livestreamerPath, QString quality)
 	}
 
 	setWatching(true);
+	updateWidgetItem();
 
 	QObject::connect(m_process, SIGNAL(finished(int)), this, SLOT(on_processFinished(int)));
 }
