@@ -243,6 +243,7 @@ void MainWindow::actionAddStream()
 
 			if(!duplicate) {
 				m_streams.append(newStream);
+				newStream->update(); // update new stream
 			}
 		}
 		catch(StreamException &e) {
