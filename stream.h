@@ -27,6 +27,9 @@ class StreamItem: public QObject, public QTreeWidgetItem
 private slots:
 	void on_processFinished(int exitStatus);
 
+signals:
+	void error(int errorType, StreamItem* stream);
+
 protected:
 	QString m_host;
 	QString m_name;
@@ -37,6 +40,11 @@ protected:
 	void updateWidgetItem();
 
 public:
+	enum {
+		ERROR_LS_NOT_FOUND,
+		ERROR_LS_CRASHED
+	};
+
 	StreamItem(QTreeWidget* parent, QString const& name);
 	virtual ~StreamItem();
 
@@ -65,7 +73,6 @@ public:
 	enum {
 		INVALID_URL,
 		HOST_NOT_SUPPORTED,
-		LIVESTREAMER_FAILED
 	};
 };
 

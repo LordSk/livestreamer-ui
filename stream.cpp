@@ -53,9 +53,14 @@ void StreamItem::setWatching(bool watching)
 
 void StreamItem::on_processFinished(int exitStatus)
 {
-	Q_UNUSED(exitStatus)
 	setWatching(false);
 	updateWidgetItem();
+
+	// livestreamer crashed
+	if(exitStatus != QProcess::NormalExit) {
+		emit error(ERROR_LS_CRASHED, this);
+	}
+
 	m_process = nullptr;
 }
 
@@ -88,7 +93,8 @@ void StreamItem::watch(QString livestreamerPath, QString quality)
 	m_process->start(program, arguments);
 
 	if(!m_process->waitForStarted()) {
-		throw StreamException(StreamException::LIVESTREAMER_FAILED);
+		emit error(ERROR_LS_NOT_FOUND, this);
+		return;
 	}
 
 	setWatching(true);

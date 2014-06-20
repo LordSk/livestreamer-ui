@@ -49,6 +49,8 @@ private slots:
 	// Item list
 	void on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+	void onStreamStartError(int errorType, StreamItem* stream);
+
 private:
 	Ui::MainWindow *ui;
 	QVector<StreamItem*> m_streams;

@@ -189,6 +189,23 @@ void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int colu
 	actionWatchStream();
 }
 
+void MainWindow::onStreamStartError(int errorType, StreamItem* stream)
+{
+	Q_UNUSED(stream); // TODO fix this;
+	QString error("");
+
+	switch(errorType) {
+		case StreamItem::ERROR_LS_NOT_FOUND:
+			error = "livestreamer not found";
+			break;
+		case StreamItem::ERROR_LS_CRASHED:
+			error = "livestreamer exited prematurely";
+			break;
+	}
+
+	statusError("Error: " + error);
+}
+
 QString MainWindow::getQualityStr()
 {
 	switch(m_settings.preferredQuality) {
@@ -279,19 +296,16 @@ void MainWindow::actionRemoveStream()
 
 void MainWindow::actionWatchStream()
 {
-	StreamItem* s = getSelectedStream();
+	StreamItem* stream = getSelectedStream();
 
-	if(!s || !s->isOnline())
+	if(!stream || !stream->isOnline())
 		return;
 
-	try {
-		statusStream(s->getUrl() + " starting...");
-		s->watch(m_settings.livestreamerPath, getQualityStr());
-	}
-	catch(StreamException &e) {
-		Q_UNUSED(e)
-		statusError("Error: couldn't start livestreamer.");
-	}
+	statusStream(stream->getUrl() + " starting...");
+	stream->watch(m_settings.livestreamerPath, getQualityStr());
+
+	// error signal
+	QObject::connect(stream, SIGNAL(error(int,StreamItem*)), this, SLOT(onStreamStartError(int,StreamItem*)));
 }
 
 void MainWindow::actionUpdateStreams()
