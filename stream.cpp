@@ -43,6 +43,7 @@ void StreamItem::updateWidgetItem()
 	else {
 		setTextColor(COLUMN_NAME, QColor("grey"));
 		setTextColor(COLUMN_VIEWERS, QColor("grey"));
+		setText(COLUMN_VIEWERS, QString::number(0));
 	}
 }
 
