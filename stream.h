@@ -6,6 +6,7 @@
 #include <QException>
 #include <QTreeWidget>
 #include <QProcess>
+#include <QUrl>
 
 /**
  * @brief Base stream class
@@ -16,12 +17,6 @@ class StreamItem: public QObject, public QTreeWidgetItem
 
 	QProcess* m_process;
 
-	enum {
-		COLUMN_ICON,
-		COLUMN_NAME,
-		COLUMN_VIEWERS,
-	};
-
 	void setWatching(bool watching);
 
 private slots:
@@ -31,8 +26,13 @@ signals:
 	void error(int errorType, StreamItem* stream);
 
 protected:
-	QString m_host;
-	QString m_name;
+	enum {
+		COLUMN_ICON,
+		COLUMN_NAME,
+		COLUMN_VIEWERS,
+	};
+
+	QUrl m_url;
 	int m_viewerCount;
 	bool m_online;
 	bool m_watching;
@@ -45,12 +45,13 @@ public:
 		ERROR_LS_CRASHED
 	};
 
-	StreamItem(QTreeWidget* parent, QString const& name);
+	StreamItem(QTreeWidget* parent, QUrl const& url);
 	virtual ~StreamItem();
 
 	virtual bool update();
 	void watch(QString livestreamerPath, QString quality);
 	QString getUrl() const;
+	virtual QString getName() const;
 	bool isOnline() const;
 
 	bool operator==(StreamItem const& other) const;

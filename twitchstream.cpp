@@ -3,6 +3,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+QString TwitchStreamItem::getName() const
+{
+	return m_url.path().split("/", QString::SkipEmptyParts).first();
+}
+
 void TwitchStreamItem::replyFinished(QNetworkReply* reply)
 {
 	if(reply->error() == QNetworkReply::NoError) {
@@ -24,18 +29,18 @@ void TwitchStreamItem::replyFinished(QNetworkReply* reply)
 	delete reply;
 }
 
-TwitchStreamItem::TwitchStreamItem(QTreeWidget* parent, QString const& name)
-	: StreamItem(parent, name),
+TwitchStreamItem::TwitchStreamItem(QTreeWidget* parent, const QUrl& url)
+	: StreamItem(parent, url),
 	  m_netManager(this)
 {
-	m_host = TWITCH_NAME;
-	setIcon(0, QIcon(":twitch.ico"));
+	setIcon(COLUMN_ICON, QIcon(":twitch.ico"));
+	setText(COLUMN_NAME, getName());
 
 	connect(&m_netManager, &QNetworkAccessManager::finished, this, &TwitchStreamItem::replyFinished);
 }
 
 bool TwitchStreamItem::update()
 {
-	m_netManager.get(QNetworkRequest(QUrl("https://api.twitch.tv/kraken/streams/" + m_name + "?client_id=typums7x8lg9a0esmu4y7vyqitufa3")));
+	m_netManager.get(QNetworkRequest(QUrl("https://api.twitch.tv/kraken/streams/" + getName() + "?client_id=typums7x8lg9a0esmu4y7vyqitufa3")));
 	return true;
 }

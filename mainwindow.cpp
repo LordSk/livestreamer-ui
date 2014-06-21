@@ -329,7 +329,7 @@ void MainWindow::watchStream()
 	if(!stream || !stream->isOnline())
 		return;
 
-	statusStream(stream->getUrl() + " starting...");
+	statusStream(stream->getName() + " starting...");
 	stream->watch(m_settings.livestreamerPath, getQualityStr());
 
 	// error signal
@@ -392,7 +392,7 @@ void MainWindow::saveStreams()
 	QTextStream out(&file);
 
 	for(auto s : m_streams) {
-		out << "http://" + s->getUrl() << "\n";
+		out << s->getUrl() << "\n";
 	}
 }
 

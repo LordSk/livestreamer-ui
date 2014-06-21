@@ -14,9 +14,10 @@ private slots:
 	void replyFinished(QNetworkReply* reply);
 
 public:
-	TwitchStreamItem(QTreeWidget* parent, QString const& name);
+	TwitchStreamItem(QTreeWidget* parent, QUrl const& url);
 
 	virtual bool update();
+	virtual QString getName() const;
 };
 
 #endif // TWITCHSTREAM_H

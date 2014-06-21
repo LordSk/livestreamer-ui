@@ -1,20 +1,18 @@
 #include "stream.h"
 #include "twitchstream.h"
-#include <QUrl>
 #include <QtDebug>
 
-StreamItem::StreamItem(QTreeWidget* parent, QString const& name)
+StreamItem::StreamItem(QTreeWidget* parent, const QUrl& url)
 	:QTreeWidgetItem(parent)
 {
-	m_host = "";
-	m_name = name;
+	m_url = url;
 	m_viewerCount = 0;
 	m_online = false;
 	m_watching = false;
 	m_process = nullptr;
 
 	setIcon(COLUMN_ICON, QIcon(":twitch.ico")); // twitch icon by default
-	setText(COLUMN_NAME, m_name);
+	setText(COLUMN_NAME, getName());
 	setText(COLUMN_VIEWERS, "0");
 	setTextAlignment(COLUMN_VIEWERS, Qt::AlignRight);
 
@@ -47,6 +45,11 @@ void StreamItem::updateWidgetItem()
 	}
 }
 
+QString StreamItem::getName() const
+{
+	return m_url.path();
+}
+
 void StreamItem::setWatching(bool watching)
 {
 	m_watching = watching;
@@ -67,7 +70,7 @@ void StreamItem::on_processFinished(int exitStatus)
 
 QString StreamItem::getUrl() const
 {
-	return m_host + "/" + m_name;
+	return m_url.toString();
 }
 
 bool StreamItem::isOnline() const
@@ -106,7 +109,7 @@ void StreamItem::watch(QString livestreamerPath, QString quality)
 
 bool StreamItem::operator==(const StreamItem& other) const
 {
-	if(m_host == other.m_host && m_name == other.m_name)
+	if(m_url == other.m_url)
 		return true;
 	return false;
 }
@@ -129,23 +132,12 @@ bool StreamItem::operator<(const QTreeWidgetItem& other) const
 
 StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)
 {
-	// pre parsing via QUrl
-	QUrl qurl(url, QUrl::StrictMode);
+	QUrl qurl(url.toLower(), QUrl::StrictMode);
 
 	if(!url.isEmpty() && qurl.isValid() && !qurl.host().isEmpty()) {
-		// stream host
-		QStringList hostSplit = qurl.host().split(".", QString::SkipEmptyParts);
-		if(hostSplit.first() == "www") {
-			hostSplit.removeFirst();
-		}
-		QString host = hostSplit.join(".");
-
-		// stream name
-		QString name = qurl.path().split("/", QString::SkipEmptyParts)[0];
-
 		// create stream object
-		if(host == TWITCH_NAME) {
-			return new TwitchStreamItem(parent, name);
+		if(qurl.host().endsWith(TWITCH_NAME)) {
+			return new TwitchStreamItem(parent, qurl);
 		}
 
 		// host not supported
@@ -155,5 +147,5 @@ StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)
 		throw StreamException(StreamException::INVALID_URL);
 	}
 
-	return new StreamItem(parent, ""); // should never happen
+	return new StreamItem(parent, qurl); // should never happen
 }
