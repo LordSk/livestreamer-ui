@@ -24,3 +24,5 @@ HEADERS += mainwindow.h \
 FORMS += mainwindow.ui
 
 RESOURCES = app.qrc
+
+RC_ICONS = icons/app-ico64.ico
