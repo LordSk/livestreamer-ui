@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QPushButton>
 #include <QString>
+#include <QTimer>
 #include "stream.h"
 
 #define CONFIG_DIR "LivestreamerUI"
@@ -39,6 +40,7 @@ private slots:
 	void on_actionMedium_triggered();
 	void on_actionHigh_triggered();
 	void on_actionBest_triggered();
+	void on_actionAutoUpdateStreams_triggered();
 
 	// Toolbar
 	void onAddButton_released();
@@ -49,7 +51,9 @@ private slots:
 	// Item list
 	void on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
+	//
 	void onStreamStartError(int errorType, StreamItem* stream);
+	void onUpdateTimer();
 
 private:
 	Ui::MainWindow *ui;
@@ -77,8 +81,10 @@ private:
 		unsigned int updateInterval;
 	} m_settings;
 
+	QTimer m_updateTimer;
+
 	QString getQualityStr();
-	void updateStreamQuality(unsigned int quality);
+	void setStreamQuality(unsigned int quality);
 
 	void actionAddStream();
 	void actionRemoveStream();

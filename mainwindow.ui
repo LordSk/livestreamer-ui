@@ -133,7 +133,7 @@
     </widget>
     <addaction name="actionLivestreamer_location"/>
     <addaction name="menuPreferred_quality"/>
-    <addaction name="actionAuto_update_streams"/>
+    <addaction name="actionAutoUpdateStreams"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -198,7 +198,7 @@
     <string>Livestreamer location</string>
    </property>
   </action>
-  <action name="actionAuto_update_streams">
+  <action name="actionAutoUpdateStreams">
    <property name="checkable">
     <bool>true</bool>
    </property>

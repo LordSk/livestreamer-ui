@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow),
 
 	m_configPath(QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory)
-				 + "/" + CONFIG_DIR)
+				 + "/" + CONFIG_DIR),
+	m_updateTimer(this)
 
 {
 	ui->setupUi(this);
@@ -56,19 +57,29 @@ MainWindow::MainWindow(QWidget *parent) :
 	  configDir.mkdir(".");
 	}
 
+	// default settings
 	m_settings.livestreamerPath = "livestreamer";
 	m_settings.preferredQuality = QUALITY_BEST;
 	m_settings.autoUpdateStreams = 0;
-	m_settings.updateInterval = 60;
+	m_settings.updateInterval = 60; // 60 seconds
 
 	loadSettings();
-
-	updateStreamQuality(m_settings.preferredQuality);
-
 	loadStreams();
+
+	// set stream quality
+	setStreamQuality(m_settings.preferredQuality);
 
 	// get viewers and stuff
 	actionUpdateStreams();
+
+	// auto update
+	ui->actionAutoUpdateStreams->setChecked(false);
+	if(m_settings.autoUpdateStreams) {
+		ui->actionAutoUpdateStreams->setChecked(true);
+		m_updateTimer.start(m_settings.updateInterval * 1000);
+	}
+
+	connect(&m_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
 
 	 // enable sorting by column
 	streamList->setSortingEnabled(true);
@@ -143,22 +154,34 @@ void MainWindow::on_actionLivestreamer_location_triggered()
 
 void MainWindow::on_actionLow_triggered()
 {
-	updateStreamQuality(QUALITY_LOW);
+	setStreamQuality(QUALITY_LOW);
 }
 
 void MainWindow::on_actionMedium_triggered()
 {
-	updateStreamQuality(QUALITY_MEDIUM);
+	setStreamQuality(QUALITY_MEDIUM);
 }
 
 void MainWindow::on_actionHigh_triggered()
 {
-	updateStreamQuality(QUALITY_HIGH);
+	setStreamQuality(QUALITY_HIGH);
 }
 
 void MainWindow::on_actionBest_triggered()
 {
-	updateStreamQuality(QUALITY_BEST);
+	setStreamQuality(QUALITY_BEST);
+}
+
+void MainWindow::on_actionAutoUpdateStreams_triggered()
+{
+	if(ui->actionAutoUpdateStreams->isChecked()) {
+		m_settings.autoUpdateStreams = 1;
+		m_updateTimer.start(m_settings.updateInterval * 1000);
+	}
+	else {
+		m_settings.autoUpdateStreams = 0;
+		m_updateTimer.stop();
+	}
 }
 
 void MainWindow::onAddButton_released()
@@ -206,6 +229,11 @@ void MainWindow::onStreamStartError(int errorType, StreamItem* stream)
 	statusError("Error: " + error);
 }
 
+void MainWindow::onUpdateTimer()
+{
+	actionUpdateStreams();
+}
+
 QString MainWindow::getQualityStr()
 {
 	switch(m_settings.preferredQuality) {
@@ -222,7 +250,7 @@ QString MainWindow::getQualityStr()
 	return "best";
 }
 
-void MainWindow::updateStreamQuality(unsigned int quality)
+void MainWindow::setStreamQuality(unsigned int quality)
 {
 	if(quality >= QUALITY_MAX)
 		return;
