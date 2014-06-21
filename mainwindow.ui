@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
+    <width>300</width>
     <height>350</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>250</width>
+    <width>300</width>
     <height>350</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>250</width>
+    <width>300</width>
     <height>2048</height>
    </size>
   </property>
@@ -77,6 +77,11 @@
         <string>Viewers</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string>Quality</string>
+       </property>
+      </column>
      </widget>
     </item>
    </layout>
@@ -89,7 +94,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>250</width>
+     <width>300</width>
      <height>21</height>
     </rect>
    </property>
@@ -119,20 +124,7 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <widget class="QMenu" name="menuPreferredQuality">
-     <property name="locale">
-      <locale language="English" country="UnitedKingdom"/>
-     </property>
-     <property name="title">
-      <string>Preferred quality</string>
-     </property>
-     <addaction name="actionSetQualityLow"/>
-     <addaction name="actionSetQualityMedium"/>
-     <addaction name="actionSetQualityHigh"/>
-     <addaction name="actionSetQualityBest"/>
-    </widget>
     <addaction name="actionSetLivestreamerLocation"/>
-    <addaction name="menuPreferredQuality"/>
     <addaction name="actionAutoUpdateStreams"/>
    </widget>
    <addaction name="menuFile"/>

@@ -7,6 +7,7 @@
 #include <QTreeWidget>
 #include <QProcess>
 #include <QUrl>
+#include <QComboBox>
 
 /**
  * @brief Base stream class
@@ -18,40 +19,46 @@ class StreamItem: public QObject, public QTreeWidgetItem
 	QProcess* m_process;
 
 	void setWatching(bool watching);
+	void selectQuality(QString const& quality);
 
 private slots:
-	void on_processFinished(int exitStatus);
+	void onProcessFinished(int exitStatus);
+	void onProcessStdOut();
 
 signals:
 	void error(int errorType, StreamItem* stream);
 
 protected:
-	enum {
-		COLUMN_ICON,
-		COLUMN_NAME,
-		COLUMN_VIEWERS,
-	};
-
 	QUrl m_url;
 	int m_viewerCount;
 	bool m_online;
 	bool m_watching;
+	QComboBox* m_cbQuality;
+	QString m_quality;
 
 	void updateWidgetItem();
 
 public:
 	enum {
+		COLUMN_ICON,
+		COLUMN_NAME,
+		COLUMN_VIEWERS,
+		COLUMN_QUALITY
+	};
+
+	enum {
 		ERROR_LS_NOT_FOUND,
 		ERROR_LS_CRASHED
 	};
 
-	StreamItem(QTreeWidget* parent, QUrl const& url);
+	StreamItem(QTreeWidget* parent, QUrl const& url, QString const& quality);
 	virtual ~StreamItem();
 
 	virtual bool update();
-	void watch(QString livestreamerPath, QString quality);
+	void watch(QString livestreamerPath);
 	QString getUrl() const;
 	virtual QString getName() const;
+	QString getQuality() const;
 	bool isOnline() const;
 
 	bool operator==(StreamItem const& other) const;
@@ -82,6 +89,6 @@ public:
  * @param url
  * @return Stream*
  */
-StreamItem* createStreamItem(QTreeWidget* parent, QString const& url);
+StreamItem* createStreamItem(QTreeWidget* parent, QString const& url, QString const& quality);
 
 #endif // STREAM_H

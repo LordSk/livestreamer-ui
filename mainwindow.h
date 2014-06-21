@@ -36,10 +36,6 @@ private slots:
 
 	// Options menu
 	void on_actionSetLivestreamerLocation_triggered();
-	void on_actionSetQualityLow_triggered();
-	void on_actionSetQualityMedium_triggered();
-	void on_actionSetQualityHigh_triggered();
-	void on_actionSetQualityBest_triggered();
 	void on_actionAutoUpdateStreams_triggered();
 
 	// Toolbar
@@ -66,25 +62,13 @@ private:
 
 	const QString m_configPath;
 
-	enum Quality {
-		QUALITY_LOW=0,
-		QUALITY_MEDIUM,
-		QUALITY_HIGH,
-		QUALITY_BEST,
-		QUALITY_MAX
-	};
-
 	struct {
 		QString livestreamerPath;
-		unsigned int preferredQuality;
 		unsigned int autoUpdateStreams;
 		unsigned int updateInterval;
 	} m_settings;
 
 	QTimer m_updateTimer;
-
-	QString getQualityStr();
-	void setStreamQuality(unsigned int quality);
 
 	void addStream();
 	void removeStream();

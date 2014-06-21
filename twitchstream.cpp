@@ -29,8 +29,8 @@ void TwitchStreamItem::replyFinished(QNetworkReply* reply)
 	delete reply;
 }
 
-TwitchStreamItem::TwitchStreamItem(QTreeWidget* parent, const QUrl& url)
-	: StreamItem(parent, url),
+TwitchStreamItem::TwitchStreamItem(QTreeWidget* parent, const QUrl& url, const QString& quality)
+	: StreamItem(parent, url, quality),
 	  m_netManager(this)
 {
 	setIcon(COLUMN_ICON, QIcon(":twitch.ico"));

@@ -14,7 +14,7 @@ private slots:
 	void replyFinished(QNetworkReply* reply);
 
 public:
-	TwitchStreamItem(QTreeWidget* parent, QUrl const& url);
+	TwitchStreamItem(QTreeWidget* parent, QUrl const& url, QString const& quality);
 
 	virtual bool update();
 	virtual QString getName() const;

@@ -47,9 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	// list header
 	auto streamList = ui->streamList;
 	streamList->header()->setSectionResizeMode(QHeaderView::Fixed);
-	streamList->setColumnWidth(0, 24); // first column (website icon)
-	streamList->setColumnWidth(1, 150); // second column (Name)
-	streamList->setColumnWidth(2, 50); // third column (Viewers)
+	streamList->setColumnWidth(StreamItem::COLUMN_ICON, 24); // (Icon)
+	streamList->setColumnWidth(StreamItem::COLUMN_NAME, 150); // (Name)
+	streamList->setColumnWidth(StreamItem::COLUMN_VIEWERS, 60); // (Viewers)
+	streamList->setColumnWidth(StreamItem::COLUMN_QUALITY, 1); // (Quality)
 
 	// create the config folder
 	QDir configDir(m_configPath);
@@ -59,15 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// default settings
 	m_settings.livestreamerPath = "livestreamer";
-	m_settings.preferredQuality = QUALITY_BEST;
 	m_settings.autoUpdateStreams = 0;
 	m_settings.updateInterval = 60; // 60 seconds
 
 	loadSettings();
 	loadStreams();
-
-	// set stream quality
-	setStreamQuality(m_settings.preferredQuality);
 
 	// get viewers and stuff
 	updateStreams();
@@ -90,11 +87,12 @@ MainWindow::~MainWindow()
 {
 	saveSettings();
 	saveStreams();
-	delete ui;
 
 	for(auto s : m_streams) {
 		delete s;
 	}
+
+	delete ui;
 }
 
 void MainWindow::statusStream(const QString& msg)
@@ -150,26 +148,6 @@ void MainWindow::on_actionSetLivestreamerLocation_triggered()
 		if(selected.size() > 0)
 			m_settings.livestreamerPath = selected.first();
 	}
-}
-
-void MainWindow::on_actionSetQualityLow_triggered()
-{
-	setStreamQuality(QUALITY_LOW);
-}
-
-void MainWindow::on_actionSetQualityMedium_triggered()
-{
-	setStreamQuality(QUALITY_MEDIUM);
-}
-
-void MainWindow::on_actionSetQualityHigh_triggered()
-{
-	setStreamQuality(QUALITY_HIGH);
-}
-
-void MainWindow::on_actionSetQualityBest_triggered()
-{
-	setStreamQuality(QUALITY_BEST);
 }
 
 void MainWindow::on_actionAutoUpdateStreams_triggered()
@@ -234,39 +212,6 @@ void MainWindow::onUpdateTimer()
 	updateStreams();
 }
 
-QString MainWindow::getQualityStr()
-{
-	switch(m_settings.preferredQuality) {
-	case QUALITY_LOW:
-		return "low";
-	case QUALITY_MEDIUM:
-		return "medium";
-	case QUALITY_HIGH:
-		return "high";
-	case QUALITY_BEST:
-		return "best";
-	}
-
-	return "best";
-}
-
-void MainWindow::setStreamQuality(unsigned int quality)
-{
-	if(quality >= QUALITY_MAX)
-		return;
-
-	m_settings.preferredQuality = quality;
-
-	int i = 0;
-	for(auto a : ui->menuPreferredQuality->actions()) {
-		if(i == m_settings.preferredQuality)
-			a->setChecked(true);
-		else
-			a->setChecked(false);
-		i++;
-	}
-}
-
 void MainWindow::addStream()
 {
 	bool ok;
@@ -274,7 +219,7 @@ void MainWindow::addStream()
 
 	if (ok && !text.isEmpty()) {
 		try {
-			StreamItem* newStream = createStreamItem(ui->streamList, text);
+			StreamItem* newStream = createStreamItem(ui->streamList, text, "best");
 
 			// check for duplicates
 			bool duplicate = false;
@@ -330,7 +275,7 @@ void MainWindow::watchStream()
 		return;
 
 	statusStream(stream->getName() + " starting...");
-	stream->watch(m_settings.livestreamerPath, getQualityStr());
+	stream->watch(m_settings.livestreamerPath);
 
 	// error signal
 	QObject::connect(stream, SIGNAL(error(int,StreamItem*)), this, SLOT(onStreamStartError(int,StreamItem*)));
@@ -365,8 +310,16 @@ void MainWindow::loadStreams()
 	while (!file.atEnd()) {
 		QString line = file.readLine();
 		line.remove('\n');
+		QStringList split = line.split(" ", QString::SkipEmptyParts);
+
+		QString url = split.first();
+		QString quality = "best";
+		if(split.size() > 1) {
+			quality = split.last();
+		}
+
 		try {
-			m_streams.append(createStreamItem(ui->streamList, line));
+			m_streams.append(createStreamItem(ui->streamList, url, quality));
 		}
 		catch(StreamException &e) {
 			switch(e.getType()) {
@@ -392,30 +345,25 @@ void MainWindow::saveStreams()
 	QTextStream out(&file);
 
 	for(auto s : m_streams) {
-		out << s->getUrl() << "\n";
+		out << s->getUrl() << " " << s->getQuality() << "\n";
 	}
 }
 
 void MainWindow::loadSettings()
 {
 	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		statusError("Failed to load settings.");
 		return;
 	}
 
 	QString livestreamerPath;
-	unsigned int preferredQuality;
 	unsigned int autoUpdateStreams;
 	unsigned int updateInterval;
 
 	QString line = file.readLine();
 	line.remove('\n');
 	livestreamerPath = line;
-
-	line = file.readLine();
-	line.remove('\n');
-	preferredQuality = line.toInt();
 
 	line = file.readLine();
 	line.remove('\n');
@@ -427,8 +375,6 @@ void MainWindow::loadSettings()
 
 	if(livestreamerPath.length() > 1)
 		m_settings.livestreamerPath = livestreamerPath;
-	if(preferredQuality < QUALITY_MAX)
-		m_settings.preferredQuality = preferredQuality;
 	if(autoUpdateStreams < 2)
 		m_settings.autoUpdateStreams = autoUpdateStreams;
 	if(updateInterval > 2 && updateInterval < 60*60*5) // 5h hours max
@@ -440,13 +386,12 @@ void MainWindow::loadSettings()
 void MainWindow::saveSettings()
 {
 	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
 	QTextStream out(&file);
 
 	out << m_settings.livestreamerPath << "\n";
-	out << m_settings.preferredQuality << "\n";
 	out << m_settings.autoUpdateStreams << "\n";
 	out << m_settings.updateInterval << "\n";
 }

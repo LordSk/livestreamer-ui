@@ -2,7 +2,7 @@
 #include "twitchstream.h"
 #include <QtDebug>
 
-StreamItem::StreamItem(QTreeWidget* parent, const QUrl& url)
+StreamItem::StreamItem(QTreeWidget* parent, const QUrl& url, const QString& quality)
 	:QTreeWidgetItem(parent)
 {
 	m_url = url;
@@ -14,17 +14,24 @@ StreamItem::StreamItem(QTreeWidget* parent, const QUrl& url)
 	setIcon(COLUMN_ICON, QIcon(":twitch.ico")); // twitch icon by default
 	setText(COLUMN_NAME, getName());
 	setText(COLUMN_VIEWERS, "0");
-	setTextAlignment(COLUMN_VIEWERS, Qt::AlignRight);
+	setTextAlignment(COLUMN_VIEWERS, Qt::AlignRight | Qt::AlignVCenter);
+
+	m_cbQuality = new QComboBox(parent);
+	// default qualities
+	m_cbQuality->addItem("worst");
+	m_cbQuality->addItem("best");
+
+	// select quality
+	selectQuality(quality);
+
+	parent->setItemWidget(this, COLUMN_QUALITY, m_cbQuality);
 
 	updateWidgetItem();
 }
 
 StreamItem::~StreamItem()
 {
-	// kill livestreamer if we exit early
-	if(m_process) {
-		m_process->kill();
-	}
+	delete m_cbQuality;
 }
 
 void StreamItem::updateWidgetItem()
@@ -50,12 +57,26 @@ QString StreamItem::getName() const
 	return m_url.path();
 }
 
+QString StreamItem::getQuality() const
+{
+	return m_quality;
+}
+
 void StreamItem::setWatching(bool watching)
 {
 	m_watching = watching;
 }
 
-void StreamItem::on_processFinished(int exitStatus)
+void StreamItem::selectQuality(const QString& quality)
+{
+	m_quality = quality;
+	if(m_cbQuality->findText(quality) == -1) { // quality not found, add an entry for it
+		m_cbQuality->addItem(quality);
+	}
+	m_cbQuality->setCurrentText(quality);
+}
+
+void StreamItem::onProcessFinished(int exitStatus)
 {
 	setWatching(false);
 	updateWidgetItem();
@@ -66,6 +87,37 @@ void StreamItem::on_processFinished(int exitStatus)
 	}
 
 	m_process = nullptr;
+}
+
+void StreamItem::onProcessStdOut()
+{
+	QString line = m_process->readAllStandardOutput();
+	line.remove('\n');
+	line.remove('\r');
+
+	if(!line.isEmpty()) {
+		if(line.startsWith("[cli][info] ")) {
+			line.remove("[cli][info] ");
+
+			// update quality combobox to add available qualities
+			if(line.startsWith("Available streams: ")) {
+				line.remove("Available streams: ");
+				auto qualityList = line.split(", ");
+
+				m_cbQuality->clear();
+				m_cbQuality->addItem("best");
+				for(QString s : qualityList) {
+					if(s.count("worst") == 0 && s.count("best") == 0) {
+						m_cbQuality->addItem(s);
+					}
+				}
+				m_cbQuality->addItem("worst");
+
+				// reselect quality since we cleared
+				selectQuality(m_quality);
+			}
+		}
+	}
 }
 
 QString StreamItem::getUrl() const
@@ -83,7 +135,7 @@ bool StreamItem::update()
 	return true;
 }
 
-void StreamItem::watch(QString livestreamerPath, QString quality)
+void StreamItem::watch(QString livestreamerPath)
 {
 	// process already running, abort
 	if(m_process)
@@ -91,10 +143,11 @@ void StreamItem::watch(QString livestreamerPath, QString quality)
 
 	QString program = livestreamerPath;
 	QStringList arguments;
-	arguments << getUrl() << quality;
+	arguments << getUrl() << getQuality();
 
 	m_process = new QProcess(this);
 	m_process->start(program, arguments);
+	m_process->setProcessChannelMode(QProcess::MergedChannels);
 
 	if(!m_process->waitForStarted()) {
 		emit error(ERROR_LS_NOT_FOUND, this);
@@ -104,7 +157,8 @@ void StreamItem::watch(QString livestreamerPath, QString quality)
 	setWatching(true);
 	updateWidgetItem();
 
-	QObject::connect(m_process, SIGNAL(finished(int)), this, SLOT(on_processFinished(int)));
+	QObject::connect(m_process, SIGNAL(finished(int)), this, SLOT(onProcessFinished(int)));
+	QObject::connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onProcessStdOut()));
 }
 
 bool StreamItem::operator==(const StreamItem& other) const
@@ -130,14 +184,14 @@ bool StreamItem::operator<(const QTreeWidgetItem& other) const
 	return text(column).toLower() < other.text(column).toLower();
 }
 
-StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)
+StreamItem* createStreamItem(QTreeWidget* parent, QString const& url, QString const& quality)
 {
 	QUrl qurl(url.toLower(), QUrl::StrictMode);
 
 	if(!url.isEmpty() && qurl.isValid() && !qurl.host().isEmpty()) {
 		// create stream object
 		if(qurl.host().endsWith(TWITCH_NAME)) {
-			return new TwitchStreamItem(parent, qurl);
+			return new TwitchStreamItem(parent, qurl, quality);
 		}
 
 		// host not supported
@@ -147,5 +201,5 @@ StreamItem* createStreamItem(QTreeWidget* parent, QString const& url)
 		throw StreamException(StreamException::INVALID_URL);
 	}
 
-	return new StreamItem(parent, qurl); // should never happen
+	return new StreamItem(parent, qurl, quality); // should never happen
 }
