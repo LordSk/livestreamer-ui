@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	setStreamQuality(m_settings.preferredQuality);
 
 	// get viewers and stuff
-	actionUpdateStreams();
+	updateStreams();
 
 	// auto update
 	ui->actionAutoUpdateStreams->setChecked(false);
@@ -115,17 +115,17 @@ void MainWindow::statusError(const QString& msg)
 	ui->statusBar->showMessage(msg, 10000);
 }
 
-void MainWindow::on_actionAdd_stream_triggered()
+void MainWindow::on_actionAddStream_triggered()
 {
-	actionAddStream();
+	addStream();
 }
 
-void MainWindow::on_actionRemove_selected_triggered()
+void MainWindow::on_actionRemoveSelected_triggered()
 {
-	actionRemoveStream();
+	removeStream();
 }
 
-void MainWindow::on_actionClear_all_triggered()
+void MainWindow::on_actionClearAll_triggered()
 {
 	for(auto s : m_streams) {
 		delete s;
@@ -134,7 +134,7 @@ void MainWindow::on_actionClear_all_triggered()
 	m_streams.clear();
 }
 
-void MainWindow::on_actionLivestreamer_location_triggered()
+void MainWindow::on_actionSetLivestreamerLocation_triggered()
 {
 	QFileDialog dialog(this);
 
@@ -152,22 +152,22 @@ void MainWindow::on_actionLivestreamer_location_triggered()
 	}
 }
 
-void MainWindow::on_actionLow_triggered()
+void MainWindow::on_actionSetQualityLow_triggered()
 {
 	setStreamQuality(QUALITY_LOW);
 }
 
-void MainWindow::on_actionMedium_triggered()
+void MainWindow::on_actionSetQualityMedium_triggered()
 {
 	setStreamQuality(QUALITY_MEDIUM);
 }
 
-void MainWindow::on_actionHigh_triggered()
+void MainWindow::on_actionSetQualityHigh_triggered()
 {
 	setStreamQuality(QUALITY_HIGH);
 }
 
-void MainWindow::on_actionBest_triggered()
+void MainWindow::on_actionSetQualityBest_triggered()
 {
 	setStreamQuality(QUALITY_BEST);
 }
@@ -186,22 +186,22 @@ void MainWindow::on_actionAutoUpdateStreams_triggered()
 
 void MainWindow::onAddButton_released()
 {
-	actionAddStream();
+	addStream();
 }
 
 void MainWindow::onRemoveButton_released()
 {
-	actionRemoveStream();
+	removeStream();
 }
 
 void MainWindow::onWatchButton_released()
 {
-	actionWatchStream();
+	watchStream();
 }
 
 void MainWindow::onUpdateButton_released()
 {
-	actionUpdateStreams();
+	updateStreams();
 }
 
 void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -209,7 +209,7 @@ void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int colu
 	Q_UNUSED(item)
 	Q_UNUSED(column)
 
-	actionWatchStream();
+	watchStream();
 }
 
 void MainWindow::onStreamStartError(int errorType, StreamItem* stream)
@@ -231,7 +231,7 @@ void MainWindow::onStreamStartError(int errorType, StreamItem* stream)
 
 void MainWindow::onUpdateTimer()
 {
-	actionUpdateStreams();
+	updateStreams();
 }
 
 QString MainWindow::getQualityStr()
@@ -258,7 +258,7 @@ void MainWindow::setStreamQuality(unsigned int quality)
 	m_settings.preferredQuality = quality;
 
 	int i = 0;
-	for(auto a : ui->menuPreferred_quality->actions()) {
+	for(auto a : ui->menuPreferredQuality->actions()) {
 		if(i == m_settings.preferredQuality)
 			a->setChecked(true);
 		else
@@ -267,7 +267,7 @@ void MainWindow::setStreamQuality(unsigned int quality)
 	}
 }
 
-void MainWindow::actionAddStream()
+void MainWindow::addStream()
 {
 	bool ok;
 	QString text = QInputDialog::getText(this, "Stream url", "Enter the stream url:", QLineEdit::Normal, "", &ok);
@@ -304,7 +304,7 @@ void MainWindow::actionAddStream()
 	}
 }
 
-void MainWindow::actionRemoveStream()
+void MainWindow::removeStream()
 {
 	StreamItem* stream = getSelectedStream();
 
@@ -322,7 +322,7 @@ void MainWindow::actionRemoveStream()
 	}
 }
 
-void MainWindow::actionWatchStream()
+void MainWindow::watchStream()
 {
 	StreamItem* stream = getSelectedStream();
 
@@ -336,7 +336,7 @@ void MainWindow::actionWatchStream()
 	QObject::connect(stream, SIGNAL(error(int,StreamItem*)), this, SLOT(onStreamStartError(int,StreamItem*)));
 }
 
-void MainWindow::actionUpdateStreams()
+void MainWindow::updateStreams()
 {
 	for(auto s : m_streams) {
 		s->update();

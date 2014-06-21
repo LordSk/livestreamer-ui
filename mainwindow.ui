@@ -100,17 +100,17 @@
     <property name="title">
      <string>Stream</string>
     </property>
-    <addaction name="actionAdd_stream"/>
-    <addaction name="actionRemove_selected"/>
-    <addaction name="actionClear_all"/>
+    <addaction name="actionAddStream"/>
+    <addaction name="actionRemoveSelected"/>
+    <addaction name="actionClearAll"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>About</string>
     </property>
-    <addaction name="actionAbout_Livestreamer_UI"/>
-    <addaction name="actionAbout_livestreamer"/>
-    <addaction name="actionAbout_Qt"/>
+    <addaction name="actionAboutLivestreamerUI"/>
+    <addaction name="actionAboutLivestreamer"/>
+    <addaction name="actionAboutQt"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="locale">
@@ -119,20 +119,20 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <widget class="QMenu" name="menuPreferred_quality">
+    <widget class="QMenu" name="menuPreferredQuality">
      <property name="locale">
       <locale language="English" country="UnitedKingdom"/>
      </property>
      <property name="title">
       <string>Preferred quality</string>
      </property>
-     <addaction name="actionLow"/>
-     <addaction name="actionMedium"/>
-     <addaction name="actionHigh"/>
-     <addaction name="actionBest"/>
+     <addaction name="actionSetQualityLow"/>
+     <addaction name="actionSetQualityMedium"/>
+     <addaction name="actionSetQualityHigh"/>
+     <addaction name="actionSetQualityBest"/>
     </widget>
-    <addaction name="actionLivestreamer_location"/>
-    <addaction name="menuPreferred_quality"/>
+    <addaction name="actionSetLivestreamerLocation"/>
+    <addaction name="menuPreferredQuality"/>
     <addaction name="actionAutoUpdateStreams"/>
    </widget>
    <addaction name="menuFile"/>
@@ -163,37 +163,37 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <action name="actionAdd_stream">
+  <action name="actionAddStream">
    <property name="text">
     <string>Add stream</string>
    </property>
   </action>
-  <action name="actionRemove_selected">
+  <action name="actionRemoveSelected">
    <property name="text">
     <string>Remove selected</string>
    </property>
   </action>
-  <action name="actionClear_all">
+  <action name="actionClearAll">
    <property name="text">
     <string>Clear all</string>
    </property>
   </action>
-  <action name="actionAbout_Livestreamer_UI">
+  <action name="actionAboutLivestreamerUI">
    <property name="text">
     <string>About Livestreamer UI</string>
    </property>
   </action>
-  <action name="actionAbout_livestreamer">
+  <action name="actionAboutLivestreamer">
    <property name="text">
     <string>About livestreamer</string>
    </property>
   </action>
-  <action name="actionAbout_Qt">
+  <action name="actionAboutQt">
    <property name="text">
     <string>About Qt</string>
    </property>
   </action>
-  <action name="actionLivestreamer_location">
+  <action name="actionSetLivestreamerLocation">
    <property name="text">
     <string>Livestreamer location</string>
    </property>
@@ -206,7 +206,7 @@
     <string>Auto-update streams</string>
    </property>
   </action>
-  <action name="actionLow">
+  <action name="actionSetQualityLow">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -214,7 +214,7 @@
     <string>Low</string>
    </property>
   </action>
-  <action name="actionMedium">
+  <action name="actionSetQualityMedium">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -222,7 +222,7 @@
     <string>Medium</string>
    </property>
   </action>
-  <action name="actionHigh">
+  <action name="actionSetQualityHigh">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -230,7 +230,7 @@
     <string>High</string>
    </property>
   </action>
-  <action name="actionBest">
+  <action name="actionSetQualityBest">
    <property name="checkable">
     <bool>true</bool>
    </property>

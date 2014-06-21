@@ -30,16 +30,16 @@ public:
 
 private slots:
 	// Stream menu
-	void on_actionAdd_stream_triggered();
-	void on_actionRemove_selected_triggered();
-	void on_actionClear_all_triggered();
+	void on_actionAddStream_triggered();
+	void on_actionRemoveSelected_triggered();
+	void on_actionClearAll_triggered();
 
 	// Options menu
-	void on_actionLivestreamer_location_triggered();
-	void on_actionLow_triggered();
-	void on_actionMedium_triggered();
-	void on_actionHigh_triggered();
-	void on_actionBest_triggered();
+	void on_actionSetLivestreamerLocation_triggered();
+	void on_actionSetQualityLow_triggered();
+	void on_actionSetQualityMedium_triggered();
+	void on_actionSetQualityHigh_triggered();
+	void on_actionSetQualityBest_triggered();
 	void on_actionAutoUpdateStreams_triggered();
 
 	// Toolbar
@@ -86,10 +86,10 @@ private:
 	QString getQualityStr();
 	void setStreamQuality(unsigned int quality);
 
-	void actionAddStream();
-	void actionRemoveStream();
-	void actionWatchStream();
-	void actionUpdateStreams();
+	void addStream();
+	void removeStream();
+	void watchStream();
+	void updateStreams();
 
 	StreamItem* getSelectedStream();
 
