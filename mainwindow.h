@@ -7,10 +7,7 @@
 #include <QString>
 #include <QTimer>
 #include "stream.h"
-
-#define CONFIG_DIR "LivestreamerUI"
-#define STREAM_SAVE_FILENAME "streams.list"
-#define SETTINGS_FILENAME "settings.cfg"
+#include "configpath.h"
 
 namespace Ui {
 class MainWindow;
@@ -59,8 +56,6 @@ private:
 	QPushButton* m_remove;
 	QPushButton* m_watch;
 	QPushButton* m_update;
-
-	const QString m_configPath;
 
 	struct {
 		QString livestreamerPath;

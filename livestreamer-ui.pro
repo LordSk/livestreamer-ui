@@ -14,12 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     stream.cpp \
-    twitchstream.cpp
+    twitchstream.cpp \
+    configpath.cpp
 SOURCES += mainwindow.cpp
 
 HEADERS += mainwindow.h \
     stream.h \
-    twitchstream.h
+    twitchstream.h \
+    configpath.h
 
 FORMS += mainwindow.ui
 

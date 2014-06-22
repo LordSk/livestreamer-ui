@@ -17,6 +17,7 @@ class StreamItem: public QObject, public QTreeWidgetItem
 	Q_OBJECT
 
 	QProcess* m_process;
+	QStringList m_processLog;
 
 	void setWatching(bool watching);
 	void selectQuality(QString const& quality);

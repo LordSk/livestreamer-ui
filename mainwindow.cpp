@@ -5,15 +5,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
-#include <QStandardPaths>
 #include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
-
-	m_configPath(QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory)
-				 + "/" + CONFIG_DIR),
 	m_updateTimer(this)
 
 {
@@ -53,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	streamList->setColumnWidth(StreamItem::COLUMN_QUALITY, 1); // (Quality)
 
 	// create the config folder
-	QDir configDir(m_configPath);
+	QDir configDir(CONFIG_PATH);
 	if (!configDir.exists()){
 	  configDir.mkdir(".");
 	}
@@ -301,7 +297,7 @@ StreamItem* MainWindow::getSelectedStream()
 
 void MainWindow::loadStreams()
 {
-	QFile file(m_configPath + "/" + STREAM_SAVE_FILENAME);
+	QFile file(CONFIG_PATH + "/" + STREAM_SAVE_FILENAME);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		statusError("Failed to load streams.");
 		return;
@@ -338,7 +334,7 @@ void MainWindow::loadStreams()
 
 void MainWindow::saveStreams()
 {
-	QFile file(m_configPath + "/" + STREAM_SAVE_FILENAME);
+	QFile file(CONFIG_PATH + "/" + STREAM_SAVE_FILENAME);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
@@ -351,7 +347,7 @@ void MainWindow::saveStreams()
 
 void MainWindow::loadSettings()
 {
-	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
+	QFile file(CONFIG_PATH + "/" + SETTINGS_FILENAME);
 	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		statusError("Failed to load settings.");
 		return;
@@ -385,7 +381,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-	QFile file(m_configPath + "/" + SETTINGS_FILENAME);
+	QFile file(CONFIG_PATH + "/" + SETTINGS_FILENAME);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 

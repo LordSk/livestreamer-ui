@@ -1,6 +1,8 @@
 #include "stream.h"
 #include "twitchstream.h"
+#include "configpath.h"
 #include <QtDebug>
+#include <QFile>
 
 StreamItem::StreamItem(QTreeWidget* parent, const QUrl& url, const QString& quality)
 	:QTreeWidgetItem(parent)
@@ -87,6 +89,15 @@ void StreamItem::onProcessFinished(int exitStatus)
 	}
 
 	m_process = nullptr;
+
+	QFile file(CONFIG_PATH + "/" + getName() + ".log");
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+
+	QTextStream out(&file);
+	for(auto s : m_processLog) {
+		out << s << "\n";
+	}
 }
 
 void StreamItem::onProcessStdOut()
@@ -96,6 +107,8 @@ void StreamItem::onProcessStdOut()
 	line.remove('\r');
 
 	if(!line.isEmpty()) {
+		m_processLog.append(line);
+
 		if(line.startsWith("[cli][info] ")) {
 			line.remove("[cli][info] ");
 
