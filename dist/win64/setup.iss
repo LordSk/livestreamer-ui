@@ -57,6 +57,6 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\redist\{#VSRedistExe}"; Description: "Install {#VSRedistName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\redist\{#VSRedistExe}"; Parameters: "/norestart"; Description: "Install {#VSRedistName}"; Flags: nowait postinstall skipifsilent
 
 
