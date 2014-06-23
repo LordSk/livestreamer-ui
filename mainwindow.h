@@ -49,7 +49,7 @@ private slots:
 	void on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 	//
-	void onStreamStartError(int errorType, StreamItem* stream);
+	void onStreamStartError(int errorType, QString const& errorTxt);
 	void onUpdateTimer();
 
 private:

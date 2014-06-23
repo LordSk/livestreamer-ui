@@ -201,21 +201,20 @@ void MainWindow::on_streamList_itemDoubleClicked(QTreeWidgetItem *item, int colu
 	watchStream();
 }
 
-void MainWindow::onStreamStartError(int errorType, StreamItem* stream)
+void MainWindow::onStreamStartError(int errorType, const QString& errorTxt)
 {
-	Q_UNUSED(stream); // TODO fix this;
-	QString error("");
-
 	switch(errorType) {
 		case StreamItem::ERROR_LS_NOT_FOUND:
-			error = "livestreamer not found";
+			statusError("livestreamer not found");
 			break;
-		case StreamItem::ERROR_LS_CRASHED:
-			error = "livestreamer exited prematurely";
+		// TODO: should we use this?
+		/*case StreamItem::ERROR_LS_CRASHED:
+			statusError("livestreamer exited prematurely");
+			break;*/
+		case StreamItem::ERROR_LS_ERROR:
+			statusError(errorTxt);
 			break;
 	}
-
-	statusError("Error: " + error);
 }
 
 void MainWindow::onUpdateTimer()
@@ -289,7 +288,7 @@ void MainWindow::watchStream()
 	stream->watch(m_settings.livestreamerPath);
 
 	// error signal
-	QObject::connect(stream, SIGNAL(error(int,StreamItem*)), this, SLOT(onStreamStartError(int,StreamItem*)));
+	QObject::connect(stream, SIGNAL(error(int,QString const&)), this, SLOT(onStreamStartError(int,QString const&)));
 }
 
 void MainWindow::updateStreams()

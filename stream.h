@@ -27,7 +27,7 @@ private slots:
 	void onProcessStdOut();
 
 signals:
-	void error(int errorType, StreamItem* stream);
+	void error(int errorType, QString const& errorTxt);
 
 protected:
 	QUrl m_url;
@@ -49,7 +49,8 @@ public:
 
 	enum {
 		ERROR_LS_NOT_FOUND,
-		ERROR_LS_CRASHED
+		ERROR_LS_CRASHED,
+		ERROR_LS_ERROR
 	};
 
 	StreamItem(QTreeWidget* parent, QUrl const& url, QString const& quality);

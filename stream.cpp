@@ -85,7 +85,7 @@ void StreamItem::onProcessFinished(int exitStatus)
 
 	// livestreamer crashed
 	if(exitStatus != QProcess::NormalExit) {
-		emit error(ERROR_LS_CRASHED, this);
+		emit error(ERROR_LS_CRASHED, "");
 	}
 
 	m_process = nullptr;
@@ -130,6 +130,10 @@ void StreamItem::onProcessStdOut()
 				selectQuality(m_quality);
 			}
 		}
+		else if(line.startsWith("error: ")) {
+			line.remove("error: ");
+			emit error(ERROR_LS_ERROR, line);
+		}
 	}
 }
 
@@ -163,7 +167,7 @@ void StreamItem::watch(QString livestreamerPath)
 	m_process->setProcessChannelMode(QProcess::MergedChannels);
 
 	if(!m_process->waitForStarted()) {
-		emit error(ERROR_LS_NOT_FOUND, this);
+		emit error(ERROR_LS_NOT_FOUND, "");
 		return;
 	}
 
