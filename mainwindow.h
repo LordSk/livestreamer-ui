@@ -35,6 +35,10 @@ private slots:
 	void on_actionSetLivestreamerLocation_triggered();
 	void on_actionAutoUpdateStreams_triggered();
 
+	// About menu
+	void on_actionAboutLivestreamerUI_triggered();
+	void on_actionAboutQt_triggered();
+
 	// Toolbar
 	void onAddButton_released();
 	void onRemoveButton_released();

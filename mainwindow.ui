@@ -114,7 +114,6 @@
      <string>About</string>
     </property>
     <addaction name="actionAboutLivestreamerUI"/>
-    <addaction name="actionAboutLivestreamer"/>
     <addaction name="actionAboutQt"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -175,11 +174,6 @@
     <string>About Livestreamer UI</string>
    </property>
   </action>
-  <action name="actionAboutLivestreamer">
-   <property name="text">
-    <string>About livestreamer</string>
-   </property>
-  </action>
   <action name="actionAboutQt">
    <property name="text">
     <string>About Qt</string>
@@ -196,38 +190,6 @@
    </property>
    <property name="text">
     <string>Auto-update streams</string>
-   </property>
-  </action>
-  <action name="actionSetQualityLow">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Low</string>
-   </property>
-  </action>
-  <action name="actionSetQualityMedium">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Medium</string>
-   </property>
-  </action>
-  <action name="actionSetQualityHigh">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>High</string>
-   </property>
-  </action>
-  <action name="actionSetQualityBest">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Best</string>
    </property>
   </action>
  </widget>

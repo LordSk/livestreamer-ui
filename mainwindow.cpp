@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -156,6 +157,20 @@ void MainWindow::on_actionAutoUpdateStreams_triggered()
 		m_settings.autoUpdateStreams = 0;
 		m_updateTimer.stop();
 	}
+}
+
+void MainWindow::on_actionAboutLivestreamerUI_triggered()
+{
+	// TODO: improve this
+	QString aboutTxt = "<p><b>LivestreamerUI</b> is a Qt based user interface for <a href=\"https://github.com/chrippa/livestreamer\">livestreamer</a>.</p>\
+			<p>It's totally free and open source. The project is hosted on Github <a href=\"https://github.com/LordSk/livestreamer-ui\">here</a>.</p>\
+			<p>You can contact me on twitter <a href=\"https://twitter.com/LordSk_\">@LordSk_</a>.</p>";
+	QMessageBox::about(this, "About LivestreamerUI", aboutTxt);
+}
+
+void MainWindow::on_actionAboutQt_triggered()
+{
+	QMessageBox::aboutQt(this);
 }
 
 void MainWindow::onAddButton_released()
