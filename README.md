@@ -1,5 +1,5 @@
-livestreamer-ui
-===============
+LivestreamerUI
+==============
 
 ![alt text](http://i.imgur.com/Mk4loBB.png "Screenshot")
 

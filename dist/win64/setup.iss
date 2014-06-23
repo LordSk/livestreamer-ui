@@ -40,6 +40,7 @@ Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\livestreamer-ui.exe"; DestDi
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\icudt52.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\icuin52.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\icuuc52.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\libGLESv2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Prog\Projets\livestreamer-ui\dist\win64\Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -57,6 +58,6 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\redist\{#VSRedistExe}"; Parameters: "/norestart"; Description: "Install {#VSRedistName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\redist\{#VSRedistExe}"; Parameters: "/passive /norestart"; Description: "Install {#VSRedistName}"; Flags: nowait postinstall skipifsilent
 
 
